@@ -1,0 +1,7 @@
+services:
+  trah-nav:
+    build: .
+    container_name: trah-nav
+    ports:
+      - "3000:80"
+    restart: unless-stopped
