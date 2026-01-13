@@ -2,7 +2,7 @@ import { RiArrowRightUpLine } from '@remixicon/react'
 
 const LinkCard = ({ item }) => {
     const IconComponent = item.icon
-    
+
     return (
         <a href={item.url} target="_blank" className="block group">
             <div className="bg-white hover:bg-sky-50 border border-gray-100 rounded-2xl p-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 h-full flex flex-col relative overflow-hidden">
