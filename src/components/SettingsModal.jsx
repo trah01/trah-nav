@@ -6,7 +6,8 @@ import {
     RiArrowUpSFill,
     RiArrowDownSFill,
     RiDownloadLine,
-    RiUploadLine
+    RiUploadLine,
+    RiImageLine
 } from '@remixicon/react'
 import { getIconName } from '../utils/iconMap'
 import LinkManager from './LinkManager'
@@ -26,10 +27,21 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
     const [activeTab, setActiveTab] = useState('general')
     const fileInputRef = useRef(null)
     const faviconInputRef = useRef(null)
+    const bgImageInputRef = useRef(null)
 
     useEffect(() => {
         setFormData(config)
     }, [config, isOpen])
+
+    // 模态框打开时禁止 body 滚动
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden'
+        }
+        return () => {
+            document.body.style.overflow = ''
+        }
+    }, [isOpen])
 
     if (!isOpen) return null
 
@@ -161,6 +173,31 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
         e.target.value = ''
     }
 
+    const handleBgImageUpload = (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+
+        if (file.size > 2 * 1024 * 1024) { // 2MB 限制
+            alert('背景图片过大，请选择 2MB 以内的图片')
+            return
+        }
+
+        const reader = new FileReader()
+        reader.onload = (event) => {
+            setFormData(prev => ({ ...prev, backgroundImage: event.target.result }))
+        }
+        reader.readAsDataURL(file)
+        e.target.value = ''
+    }
+
+    const handleClearBgImage = () => {
+        setFormData(prev => ({ ...prev, backgroundImage: '' }))
+    }
+
+    const handleClearFavicon = () => {
+        setFormData(prev => ({ ...prev, favicon: '' }))
+    }
+
     const handleSave = () => {
         onSave(formData)
         onClose()
@@ -242,6 +279,16 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                             >
                                                 <RiUploadLine size={20} />
                                             </button>
+                                            {formData.favicon && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleClearFavicon}
+                                                    className="shrink-0 p-2 rounded-xl border border-slate-200 text-rose-500 hover:bg-rose-50 transition-colors"
+                                                    title="清除图标"
+                                                >
+                                                    <RiDeleteBinLine size={20} />
+                                                </button>
+                                            )}
                                             <input
                                                 type="file"
                                                 ref={faviconInputRef}
@@ -323,16 +370,57 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                 <h3 className="text-sm font-bold text-slate-900 mb-3">个性化与备份</h3>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">自定义壁纸 URL</label>
-                                        <input
-                                            type="text"
-                                            name="backgroundImage"
-                                            value={formData.backgroundImage || ''}
-                                            onChange={handleChange}
-                                            placeholder="https://..."
-                                            className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
-                                        />
-                                        <p className="text-xs text-slate-400 mt-1">留空则显示默认背景</p>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">自定义壁纸</label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                name="backgroundImage"
+                                                value={formData.backgroundImage || ''}
+                                                onChange={handleChange}
+                                                placeholder="输入图片 URL 或上传本地图片"
+                                                className="flex-1 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => bgImageInputRef.current?.click()}
+                                                className="shrink-0 p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                                                title="上传背景图片"
+                                            >
+                                                <RiImageLine size={20} />
+                                            </button>
+                                            <input
+                                                type="file"
+                                                ref={bgImageInputRef}
+                                                onChange={handleBgImageUpload}
+                                                accept="image/*"
+                                                className="hidden"
+                                            />
+                                        </div>
+                                        <p className="text-xs text-slate-400 mt-1">支持 URL 或上传本地图片（最大 2MB），留空则显示默认背景</p>
+                                        
+                                        {/* 背景图预览 */}
+                                        {formData.backgroundImage && (
+                                            <div className="mt-3 relative group">
+                                                <div className="w-full h-24 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+                                                    <img 
+                                                        src={formData.backgroundImage} 
+                                                        alt="背景预览" 
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => {
+                                                            e.target.style.display = 'none'
+                                                        }}
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleClearBgImage}
+                                                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                                                    title="清除背景图"
+                                                >
+                                                    <RiDeleteBinLine size={14} />
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="flex gap-3">
