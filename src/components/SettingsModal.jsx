@@ -7,10 +7,28 @@ import {
     RiArrowDownSFill,
     RiDownloadLine,
     RiUploadLine,
-    RiImageLine
+    RiImageLine,
+    RiGithubFill,
+    RiStickyNoteLine,
+    RiTimerLine,
+    RiDoubleQuotesL,
+    RiTimeLine,
+    RiCalendarLine,
+    RiCheckboxCircleFill,
+    RiCheckboxBlankCircleLine
 } from '@remixicon/react'
 import { getIconName } from '../utils/iconMap'
 import LinkManager from './LinkManager'
+
+// 可选的轮播组件列表
+const WIDGET_OPTIONS = [
+    { id: 'github', label: 'GitHub 卡片', icon: RiGithubFill },
+    { id: 'note', label: '快捷便签', icon: RiStickyNoteLine },
+    { id: 'pomodoro', label: '番茄时钟', icon: RiTimerLine },
+    { id: 'hitokoto', label: '每日一言', icon: RiDoubleQuotesL },
+    { id: 'calendar', label: '日历', icon: RiCalendarLine },
+    { id: 'clock', label: '模拟时钟', icon: RiTimeLine },
+]
 
 const weekDays = [
     { val: '1', label: '周一' },
@@ -113,6 +131,15 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
     const handleChange = (e) => {
         const { name, value } = e.target
         setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const toggleWidget = (widgetId) => {
+        const current = formData.enabledWidgets || []
+        const isEnabled = current.includes(widgetId)
+        const newWidgets = isEnabled
+            ? current.filter(id => id !== widgetId)
+            : [...current, widgetId]
+        setFormData(prev => ({ ...prev, enabledWidgets: newWidgets }))
     }
 
     const handleEventChange = (id, field, value) => {
@@ -218,6 +245,7 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                 <div className="flex border-b border-gray-100 px-6 bg-slate-50/50">
                     {[
                         { id: 'general', label: '基本设置' },
+                        { id: 'widgets', label: '轮播组件' },
                         { id: 'links', label: '链接管理' },
                         { id: 'countdown', label: '倒计时' }
                     ].map(tab => (
@@ -445,6 +473,46 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                         />
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'widgets' && (
+                        <div className="space-y-4 max-w-lg mx-auto">
+                            <p className="text-sm text-slate-500 mb-4">勾选要显示的组件，在侧边栏上方区域轮播显示。</p>
+                            <div className="grid grid-cols-1 gap-3">
+                                {WIDGET_OPTIONS.map(opt => {
+                                    const isChecked = (formData.enabledWidgets || []).includes(opt.id)
+                                    const IconComponent = opt.icon
+                                    return (
+                                        <div
+                                            key={opt.id}
+                                            onClick={() => toggleWidget(opt.id)}
+                                            className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
+                                                isChecked
+                                                    ? 'bg-blue-50 border-blue-200 ring-1 ring-blue-200'
+                                                    : 'bg-white border-slate-200 hover:bg-slate-50'
+                                            }`}
+                                        >
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                                isChecked
+                                                    ? 'bg-blue-100 text-blue-600'
+                                                    : 'bg-slate-100 text-slate-400'
+                                            }`}>
+                                                <IconComponent size={20} />
+                                            </div>
+                                            <span className={`font-bold ${isChecked ? 'text-slate-800' : 'text-slate-500'}`}>
+                                                {opt.label}
+                                            </span>
+                                            <div className="ml-auto">
+                                                {isChecked
+                                                    ? <RiCheckboxCircleFill size={24} className="text-blue-500" />
+                                                    : <RiCheckboxBlankCircleLine size={24} className="text-slate-300" />
+                                                }
+                                            </div>
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
                     )}

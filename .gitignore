@@ -1,6 +1,7 @@
 
 # Dependencies
 node_modules/
+example.html
 
 # Build output
 dist/

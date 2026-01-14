@@ -17,7 +17,7 @@ const CountdownCard = ({ events }) => {
             </div>
 
             {/* Events List */}
-            <div className="flex-1 overflow-y-auto scrollbar-hide py-1 pr-1 space-y-1.5 max-h-[188px] overscroll-contain">
+            <div className="flex-1 overflow-y-auto scrollbar-hide py-1 pr-1 space-y-1.5 max-h-[180px] overscroll-contain">
                 {events.map(event => {
                     const { days, isPast } = calculateEventDetails(event)
 

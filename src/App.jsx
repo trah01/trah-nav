@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { pinyin } from 'pinyin-pro'
+import { Solar } from 'lunar-javascript'
 import { RiSearch2Line, RiGhostLine, RiGoogleFill, RiMicrosoftFill } from '@remixicon/react'
 import { linksData as defaultLinksData } from './data/links'
 import { getIconByName } from './utils/iconMap'
@@ -32,6 +33,8 @@ const defaultConfig = {
     weatherAdcode: '',
     // 个性化
     backgroundImage: '',
+    // 轮播组件
+    enabledWidgets: ['github'],
     // 倒计时事件
     countdownEvents: [
         { id: 1, title: '周末', type: 'weekly', value: '6', color: 'text-blue-500', bg: 'bg-blue-400' },
@@ -106,7 +109,13 @@ const App = () => {
 
         // 快捷键支持
         const handleKeyDown = (e) => {
-            if (e.key === '/' && document.activeElement !== searchInputRef.current) {
+            // 如果当前焦点在任何输入框或文本域中，不触发快捷键
+            const activeEl = document.activeElement
+            const isInputFocused = activeEl?.tagName === 'INPUT' || 
+                                   activeEl?.tagName === 'TEXTAREA' || 
+                                   activeEl?.isContentEditable
+            
+            if (e.key === '/' && !isInputFocused) {
                 e.preventDefault()
                 searchInputRef.current?.focus()
             }
@@ -193,6 +202,33 @@ const App = () => {
 
     const hasResults = filteredLinks.length > 0
 
+    // 获取农历和节日信息
+    const getLunarInfo = () => {
+        const solar = Solar.fromDate(time)
+        const lunar = solar.getLunar()
+        
+        // 农历日期
+        const lunarDate = `${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`
+        
+        // 获取节日（优先级：公历节日 > 农历节日 > 节气）
+        const solarFestivals = solar.getFestivals()
+        const lunarFestivals = lunar.getFestivals()
+        const jieQi = lunar.getJieQi()
+        
+        let festival = ''
+        if (solarFestivals.length > 0) {
+            festival = solarFestivals[0]
+        } else if (lunarFestivals.length > 0) {
+            festival = lunarFestivals[0]
+        } else if (jieQi) {
+            festival = jieQi
+        }
+        
+        return { lunarDate, festival }
+    }
+
+    const { lunarDate, festival } = getLunarInfo()
+
     // 搜索引擎快捷键处理
     const handleSearchKeyDown = (e) => {
         if (e.key === 'Enter') {
@@ -236,13 +272,21 @@ const App = () => {
 
                     <div className="md:col-span-12 lg:col-span-5 flex flex-col justify-center py-4 px-2">
                         <div>
-                            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-slate-800 font-mono tracking-tighter">
+                            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-slate-800 font-mono tracking-wide">
                                 {time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                             </h1>
-                            <div className="flex items-center space-x-3 mt-3">
+                            <div className="flex items-center flex-wrap gap-2 mt-3">
                                 <span className="px-4 py-1.5 rounded-full bg-slate-200 text-slate-600 text-sm font-bold uppercase tracking-wider">
                                     {time.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', weekday: 'short' })}
                                 </span>
+                                <span className="px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 text-sm font-medium">
+                                    {lunarDate}
+                                </span>
+                                {festival && (
+                                    <span className="px-3 py-1.5 rounded-full bg-rose-100 text-rose-600 text-sm font-medium">
+                                        {festival}
+                                    </span>
+                                )}
                                 <p className="text-slate-500 font-medium text-lg">{greeting}</p>
                             </div>
 
@@ -318,6 +362,8 @@ const App = () => {
                         username={config.username}
                         githubUrl={config.githubUrl}
                         onSettingsClick={() => setSettingsOpen(true)}
+                        enabledWidgets={config.enabledWidgets}
+                        time={time}
                     />
 
                     {linkGroups.map((group, index) => (
