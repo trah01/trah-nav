@@ -30,7 +30,7 @@ npm run dev
 ### Docker 部署
 
 ```bash
-docker-compose up -d --build
+docker-compose up -d
 # 访问 http://localhost:3000
 ```
 

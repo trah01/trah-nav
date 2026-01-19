@@ -1,6 +1,6 @@
 services:
   trah-nav:
-    build: .
+    image: trah01/trah-nav:latest
     container_name: trah-nav
     ports:
       - "3000:80"
