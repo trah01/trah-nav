@@ -4,11 +4,11 @@ import { Solar } from 'lunar-javascript'
 import { RiSearch2Line, RiGhostLine, RiGoogleFill, RiMicrosoftFill } from '@remixicon/react'
 import { linksData as defaultLinksData } from './data/links'
 import { getIconByName } from './utils/iconMap'
-import WeatherCard from './components/WeatherCard'
-import CountdownCard from './components/CountdownCard'
-import UserProfile from './components/UserProfile'
-import LinkSection from './components/LinkSection'
-import SettingsModal from './components/SettingsModal'
+import WeatherCard from './components/widgets/main/WeatherCard'
+import CountdownCard from './components/widgets/main/CountdownCard'
+import UserProfile from './components/widgets/main/UserProfile'
+import LinkSection from './components/links/LinkSection'
+import SettingsModal from './components/settings/SettingsModal'
 
 // 默认分类配置
 const defaultSections = [

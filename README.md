@@ -22,7 +22,7 @@
 
 项目现已支持作为浏览器插件（新标签页）使用：
 
-1. 从 [Releases](https://github.com/trah01/trah-nav/releases) 下载 `trah-nav-extension-v0.0.1.zip` 并解压。
+1. 从 [Releases](https://github.com/trah01/trah-nav/releases) 下载 `trah-nav-extension-v1.0.3.zip` 并解压。
 2. 打开 Chrome 扩展程序页面 (`chrome://extensions/`)。
 3. 开启右上角的 **“开发者模式”**。
 4. 点击 **“加载已解压的扩展程序”**，选择解压后的目录。
