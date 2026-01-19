@@ -253,8 +253,8 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`py-3 mr-8 text-sm font-bold border-b-2 transition-colors ${activeTab === tab.id
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                                ? 'border-blue-500 text-blue-600'
+                                : 'border-transparent text-slate-400 hover:text-slate-600'
                                 }`}
                         >
                             {tab.label}
@@ -425,14 +425,14 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                             />
                                         </div>
                                         <p className="text-xs text-slate-400 mt-1">支持 URL 或上传本地图片（最大 2MB），留空则显示默认背景</p>
-                                        
+
                                         {/* 背景图预览 */}
                                         {formData.backgroundImage && (
                                             <div className="mt-3 relative group">
                                                 <div className="w-full h-24 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-                                                    <img 
-                                                        src={formData.backgroundImage} 
-                                                        alt="背景预览" 
+                                                    <img
+                                                        src={formData.backgroundImage}
+                                                        alt="背景预览"
                                                         className="w-full h-full object-cover"
                                                         onError={(e) => {
                                                             e.target.style.display = 'none'
@@ -488,17 +488,15 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                         <div
                                             key={opt.id}
                                             onClick={() => toggleWidget(opt.id)}
-                                            className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
-                                                isChecked
+                                            className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${isChecked
                                                     ? 'bg-blue-50 border-blue-200 ring-1 ring-blue-200'
                                                     : 'bg-white border-slate-200 hover:bg-slate-50'
-                                            }`}
+                                                }`}
                                         >
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                                                isChecked
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isChecked
                                                     ? 'bg-blue-100 text-blue-600'
                                                     : 'bg-slate-100 text-slate-400'
-                                            }`}>
+                                                }`}>
                                                 <IconComponent size={20} />
                                             </div>
                                             <span className={`font-bold ${isChecked ? 'text-slate-800' : 'text-slate-500'}`}>

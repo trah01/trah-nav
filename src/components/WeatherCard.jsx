@@ -57,7 +57,7 @@ const WeatherCard = ({ apiKey, adcode }) => {
                 if (baseData.status === '1' && baseData.lives.length > 0) {
                     const live = baseData.lives[0]
                     let forecast = { daytemp: '--', nighttemp: '--' }
-                    
+
                     if (allData.status === '1' && allData.forecasts.length > 0 && allData.forecasts[0].casts.length > 0) {
                         forecast = allData.forecasts[0].casts[0]
                     }
@@ -95,11 +95,11 @@ const WeatherCard = ({ apiKey, adcode }) => {
     const WeatherIcon = iconMap[weather.icon] || RiSunCloudyLine
 
     return (
-        <div className="h-full flex flex-col justify-between p-6 bg-gradient-to-br from-sky-500 to-blue-700 rounded-[32px] text-white shadow-lg relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-20">
-                <WeatherIcon size={144} className="transform group-hover:scale-110 transition-transform duration-700" />
+        <div className="h-full flex flex-col justify-between p-5 sm:p-6 bg-gradient-to-br from-sky-500 to-blue-700 rounded-[32px] text-white shadow-lg relative overflow-hidden group">
+            <div className="absolute -top-4 -right-4 opacity-10 pointer-events-none">
+                <WeatherIcon size={120} className="transform group-hover:scale-110 transition-transform duration-700" />
             </div>
-            <div className="relative z-10">
+            <div className="relative z-10 flex-1 flex flex-col justify-center">
                 <div className="flex items-center space-x-2 opacity-90 mb-1">
                     <RiMapPinLine size={14} />
                     <span className="text-sm font-medium tracking-wide">{weather.city}</span>

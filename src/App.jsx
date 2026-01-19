@@ -111,10 +111,10 @@ const App = () => {
         const handleKeyDown = (e) => {
             // 如果当前焦点在任何输入框或文本域中，不触发快捷键
             const activeEl = document.activeElement
-            const isInputFocused = activeEl?.tagName === 'INPUT' || 
-                                   activeEl?.tagName === 'TEXTAREA' || 
-                                   activeEl?.isContentEditable
-            
+            const isInputFocused = activeEl?.tagName === 'INPUT' ||
+                activeEl?.tagName === 'TEXTAREA' ||
+                activeEl?.isContentEditable
+
             if (e.key === '/' && !isInputFocused) {
                 e.preventDefault()
                 searchInputRef.current?.focus()
@@ -206,15 +206,15 @@ const App = () => {
     const getLunarInfo = () => {
         const solar = Solar.fromDate(time)
         const lunar = solar.getLunar()
-        
+
         // 农历日期
         const lunarDate = `${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`
-        
+
         // 获取节日（优先级：公历节日 > 农历节日 > 节气）
         const solarFestivals = solar.getFestivals()
         const lunarFestivals = lunar.getFestivals()
         const jieQi = lunar.getJieQi()
-        
+
         let festival = ''
         if (solarFestivals.length > 0) {
             festival = solarFestivals[0]
@@ -223,7 +223,7 @@ const App = () => {
         } else if (jieQi) {
             festival = jieQi
         }
-        
+
         return { lunarDate, festival }
     }
 
@@ -270,7 +270,7 @@ const App = () => {
             <div className="relative z-10 p-4 md:p-8 flex items-center justify-center min-h-screen">
                 <div className="max-w-[1400px] w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-5 auto-rows-min">
 
-                    <div className="md:col-span-12 lg:col-span-5 flex flex-col justify-center py-4 px-2">
+                    <div className="col-span-12 lg:col-span-5 flex flex-col justify-center py-4 px-2">
                         <div>
                             <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-slate-800 font-mono tracking-wide">
                                 {time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
@@ -350,11 +350,11 @@ const App = () => {
                         </div>
                     </div>
 
-                    <div className="md:col-span-6 lg:col-span-2 min-h-[220px]">
+                    <div className="col-span-12 md:col-span-6 lg:col-span-2 min-h-[180px] sm:min-h-[220px]">
                         <WeatherCard apiKey={config.weatherKey} adcode={config.weatherAdcode} />
                     </div>
 
-                    <div className="md:col-span-6 lg:col-span-3 min-h-[220px]">
+                    <div className="col-span-12 md:col-span-6 lg:col-span-3 min-h-[180px] sm:min-h-[220px]">
                         <CountdownCard events={config.countdownEvents} />
                     </div>
 
