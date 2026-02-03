@@ -106,6 +106,7 @@ const App = () => {
     const [settingsOpen, setSettingsOpen] = useState(false)
     const [searchError, setSearchError] = useState(false)
     const searchInputRef = useRef(null)
+    const isComposingRef = useRef(false)  // 跟踪输入法组合状态
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000)
@@ -247,19 +248,28 @@ const App = () => {
         setSearch('')
     }
 
+    // 输入法组合事件处理
+    const handleCompositionStart = () => {
+        isComposingRef.current = true
+    }
+
+    const handleCompositionEnd = () => {
+        isComposingRef.current = false
+    }
+
     // 搜索引擎快捷键处理
     const handleSearchKeyDown = (e) => {
-        if (e.key === 'Enter') {
+        // 如果正在使用输入法组合（如中文拼音输入），不触发搜索
+        // 这样按回车只会上屏拼音，而不会同时触发搜索
+        if (e.key === 'Enter' && !isComposingRef.current) {
             const val = search.trim()
             if (!val) return
 
-            // 如果没有匹配到任何卡片，使用默认搜索引擎
-            if (filteredLinks.length === 0 || filteredLinks.length === links.length) {
-                const engines = config.searchEngines || defaultSearchEngines
-                const defaultEngine = engines.find(e => e.id === config.defaultSearchEngine) || engines[0]
-                if (defaultEngine) {
-                    executeSearch(defaultEngine, val)
-                }
+            // 无论有无匹配结果，都使用默认搜索引擎进行搜索
+            const engines = config.searchEngines || defaultSearchEngines
+            const defaultEngine = engines.find(e => e.id === config.defaultSearchEngine) || engines[0]
+            if (defaultEngine) {
+                executeSearch(defaultEngine, val)
             }
         }
     }
@@ -346,6 +356,8 @@ const App = () => {
                                             value={search}
                                             onChange={(e) => setSearch(e.target.value)}
                                             onKeyDown={handleSearchKeyDown}
+                                            onCompositionStart={handleCompositionStart}
+                                            onCompositionEnd={handleCompositionEnd}
                                             placeholder="在此搜索"
                                             className={`block w-full pl-8 pr-4 py-3 bg-transparent border-b-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent transition-all font-sans text-lg relative z-10 ${searchError ? 'border-red-400 animate-shake' : 'border-slate-200'}`}
                                         />
