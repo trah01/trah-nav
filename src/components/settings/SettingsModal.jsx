@@ -19,6 +19,7 @@ import {
 } from '@remixicon/react'
 import { getIconName } from '../../utils/iconMap'
 import LinkManager from '../links/LinkManager'
+import SearchEngineSettings from './SearchEngineSettings'
 
 // 可选的轮播组件列表
 const WIDGET_OPTIONS = [
@@ -232,12 +233,12 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-[32px] w-full max-w-2xl shadow-2xl flex flex-col h-[85vh]">
+            <div className="bg-white rounded-[32px] w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden">
                 {/* Header */}
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                    <h2 className="text-xl font-bold text-slate-800">设置</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full text-slate-500">
-                        <RiCloseLine size={20} />
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-slate-50/30">
+                    <h2 className="text-2xl font-bold text-slate-900">设置</h2>
+                    <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full text-slate-600 transition-colors">
+                        <RiCloseLine size={24} />
                     </button>
                 </div>
 
@@ -245,6 +246,7 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                 <div className="flex border-b border-gray-100 px-6 bg-slate-50/50">
                     {[
                         { id: 'general', label: '基本设置' },
+                        { id: 'search', label: '搜索引擎' },
                         { id: 'widgets', label: '轮播组件' },
                         { id: 'links', label: '链接管理' },
                         { id: 'countdown', label: '倒计时' }
@@ -252,9 +254,9 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`py-3 mr-8 text-sm font-bold border-b-2 transition-colors ${activeTab === tab.id
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-slate-400 hover:text-slate-600'
+                            className={`py-4 mr-8 text-base font-bold border-b-2 transition-colors ${activeTab === tab.id
+                                ? 'border-blue-500 text-blue-700'
+                                : 'border-transparent text-slate-500 hover:text-slate-700'
                                 }`}
                         >
                             {tab.label}
@@ -268,21 +270,21 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                         <div className="space-y-4 max-w-lg mx-auto">
                             {/* 网站基础信息 */}
                             <div>
-                                <h3 className="text-sm font-bold text-slate-900 mb-3">网站信息</h3>
-                                <div className="space-y-3">
+                                <h3 className="text-base font-bold text-slate-950 mb-4">网站信息</h3>
+                                <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">网站标题</label>
+                                        <label className="block text-[15px] font-semibold text-slate-800 mb-1.5">网站标题</label>
                                         <input
                                             type="text"
                                             name="siteTitle"
                                             value={formData.siteTitle || ''}
                                             onChange={handleChange}
                                             placeholder="My Nav"
-                                            className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                            className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-base text-slate-900"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Favicon URL / 上传图片</label>
+                                        <label className="block text-[15px] font-semibold text-slate-800 mb-1.5">Favicon URL / 上传图片</label>
                                         <div className="flex gap-2">
                                             <div className="flex-1 relative">
                                                 <input
@@ -291,7 +293,7 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                                     value={formData.favicon || ''}
                                                     onChange={handleChange}
                                                     placeholder="https://example.com/favicon.ico"
-                                                    className="w-full pl-4 pr-10 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                                                    className="w-full pl-5 pr-12 py-3 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-base text-slate-900"
                                                 />
                                                 {formData.favicon && (
                                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded overflow-hidden border border-slate-200 bg-white">
@@ -302,7 +304,7 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                             <button
                                                 type="button"
                                                 onClick={() => faviconInputRef.current?.click()}
-                                                className="shrink-0 p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                                                className="shrink-0 p-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
                                                 title="上传图片"
                                             >
                                                 <RiUploadLine size={20} />
@@ -311,7 +313,7 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                                 <button
                                                     type="button"
                                                     onClick={handleClearFavicon}
-                                                    className="shrink-0 p-2 rounded-xl border border-slate-200 text-rose-500 hover:bg-rose-50 transition-colors"
+                                                    className="shrink-0 p-3 rounded-xl border border-slate-300 text-rose-600 hover:bg-rose-50 transition-colors"
                                                     title="清除图标"
                                                 >
                                                     <RiDeleteBinLine size={20} />
@@ -327,78 +329,78 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">ICP 备案号</label>
+                                        <label className="block text-[15px] font-semibold text-slate-800 mb-1.5">ICP 备案号</label>
                                         <input
                                             type="text"
                                             name="icpBeian"
                                             value={formData.icpBeian || ''}
                                             onChange={handleChange}
                                             placeholder="京ICP备XXXXXXXX号"
-                                            className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                                            className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-base text-slate-900"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-gray-100">
-                                <h3 className="text-sm font-bold text-slate-900 mb-3">用户信息</h3>
-                                <div className="space-y-3">
+                            <div className="pt-6 border-t border-gray-100">
+                                <h3 className="text-base font-bold text-slate-950 mb-4">用户信息</h3>
+                                <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Admin 用户名</label>
+                                        <label className="block text-[15px] font-semibold text-slate-800 mb-1.5">Admin 用户名</label>
                                         <input
                                             type="text"
                                             name="username"
                                             value={formData.username}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                            className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-base text-slate-900"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">GitHub 链接</label>
+                                        <label className="block text-[15px] font-semibold text-slate-800 mb-1.5">GitHub 链接</label>
                                         <input
                                             type="text"
                                             name="githubUrl"
                                             value={formData.githubUrl}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                            className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-base text-slate-900"
                                         />
                                     </div>
                                 </div>
                             </div>
-                            <div className="pt-4 border-t border-gray-100">
-                                <h3 className="text-sm font-bold text-slate-900 mb-3">天气设置</h3>
-                                <div className="space-y-3">
+                            <div className="pt-6 border-t border-gray-100">
+                                <h3 className="text-base font-bold text-slate-950 mb-4">天气设置</h3>
+                                <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">高德 API Key</label>
+                                        <label className="block text-[15px] font-semibold text-slate-800 mb-1.5">高德 API Key</label>
                                         <input
                                             type="text"
                                             name="weatherKey"
                                             value={formData.weatherKey}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono text-sm"
+                                            className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono text-base text-slate-900"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">城市 Adcode (天气地址)</label>
+                                        <label className="block text-[15px] font-semibold text-slate-800 mb-1.5">城市 Adcode (天气地址)</label>
                                         <input
                                             type="text"
                                             name="weatherAdcode"
                                             value={formData.weatherAdcode}
                                             onChange={handleChange}
                                             placeholder="例如: 110000"
-                                            className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono text-sm"
+                                            className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono text-base text-slate-900"
                                         />
-                                        <p className="text-xs text-slate-400 mt-1">留空则尝试自动定位</p>
+                                        <p className="text-sm text-slate-500 mt-1.5">留空则尝试自动定位</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* 个性化与备份 */}
-                            <div className="pt-4 border-t border-gray-100">
-                                <h3 className="text-sm font-bold text-slate-900 mb-3">个性化与备份</h3>
-                                <div className="space-y-4">
+                            <div className="pt-6 border-t border-gray-100">
+                                <h3 className="text-base font-bold text-slate-950 mb-4">个性化与备份</h3>
+                                <div className="space-y-5">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">自定义壁纸</label>
+                                        <label className="block text-[15px] font-semibold text-slate-800 mb-1.5">自定义壁纸</label>
                                         <div className="flex gap-2">
                                             <input
                                                 type="text"
@@ -406,12 +408,12 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                                 value={formData.backgroundImage || ''}
                                                 onChange={handleChange}
                                                 placeholder="输入图片 URL 或上传本地图片"
-                                                className="flex-1 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                                                className="flex-1 px-5 py-3 rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-base text-slate-900"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => bgImageInputRef.current?.click()}
-                                                className="shrink-0 p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                                                className="shrink-0 p-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
                                                 title="上传背景图片"
                                             >
                                                 <RiImageLine size={20} />
@@ -424,7 +426,7 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                                 className="hidden"
                                             />
                                         </div>
-                                        <p className="text-xs text-slate-400 mt-1">支持 URL 或上传本地图片（最大 2MB），留空则显示默认背景</p>
+                                        <p className="text-sm text-slate-500 mt-1.5">支持 URL 或上传本地图片（最大 2MB），留空则显示默认背景</p>
 
                                         {/* 背景图预览 */}
                                         {formData.backgroundImage && (
@@ -451,18 +453,18 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                         )}
                                     </div>
 
-                                    <div className="flex gap-3">
+                                    <div className="flex gap-4">
                                         <button
                                             onClick={handleExport}
-                                            className="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium flex items-center justify-center gap-2"
+                                            className="flex-1 py-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-base font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                                         >
-                                            <RiDownloadLine size={16} /> 导出配置
+                                            <RiDownloadLine size={20} /> 导出配置
                                         </button>
                                         <button
                                             onClick={() => fileInputRef.current?.click()}
-                                            className="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium flex items-center justify-center gap-2"
+                                            className="flex-1 py-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-base font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                                         >
-                                            <RiUploadLine size={16} /> 导入配置
+                                            <RiUploadLine size={20} /> 导入配置
                                         </button>
                                         <input
                                             type="file"
@@ -478,8 +480,8 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                     )}
 
                     {activeTab === 'widgets' && (
-                        <div className="space-y-4 max-w-lg mx-auto">
-                            <p className="text-sm text-slate-500 mb-4">勾选要显示的组件，在侧边栏上方区域轮播显示。</p>
+                        <div className="space-y-6 max-w-lg mx-auto">
+                            <p className="text-base text-slate-600 mb-6">勾选要显示的组件，在侧边栏上方区域轮播显示。</p>
                             <div className="grid grid-cols-1 gap-3">
                                 {WIDGET_OPTIONS.map(opt => {
                                     const isChecked = (formData.enabledWidgets || []).includes(opt.id)
@@ -493,25 +495,37 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                                 : 'bg-white border-slate-200 hover:bg-slate-50'
                                                 }`}
                                         >
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isChecked
-                                                ? 'bg-blue-100 text-blue-600'
-                                                : 'bg-slate-100 text-slate-400'
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isChecked
+                                                ? 'bg-blue-100 text-blue-700'
+                                                : 'bg-slate-100 text-slate-500'
                                                 }`}>
-                                                <IconComponent size={20} />
+                                                <IconComponent size={24} />
                                             </div>
-                                            <span className={`font-bold ${isChecked ? 'text-slate-800' : 'text-slate-500'}`}>
+                                            <span className={`text-base font-bold ${isChecked ? 'text-slate-900' : 'text-slate-600'}`}>
                                                 {opt.label}
                                             </span>
                                             <div className="ml-auto">
                                                 {isChecked
-                                                    ? <RiCheckboxCircleFill size={24} className="text-blue-500" />
-                                                    : <RiCheckboxBlankCircleLine size={24} className="text-slate-300" />
+                                                    ? <RiCheckboxCircleFill size={28} className="text-blue-500" />
+                                                    : <RiCheckboxBlankCircleLine size={28} className="text-slate-300" />
                                                 }
                                             </div>
                                         </div>
                                     )
                                 })}
                             </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'search' && (
+                        <div className="max-w-lg mx-auto">
+                            <SearchEngineSettings
+                                searchEngines={formData.searchEngines}
+                                defaultEngine={formData.defaultSearchEngine}
+                                onChange={(updates) => {
+                                    setFormData(prev => ({ ...prev, ...updates }))
+                                }}
+                            />
                         </div>
                     )}
 
@@ -528,44 +542,44 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                     )}
 
                     {activeTab === 'countdown' && (
-                        <div className="space-y-4 max-w-lg mx-auto">
-                            <p className="text-xs text-slate-400 mb-2">
+                        <div className="space-y-5 max-w-lg mx-auto">
+                            <p className="text-[15px] text-slate-600 mb-2">
                                 提示：首页仅显示前 3 个事件。可使用箭头调整顺序。过去的日期会显示已过天数。
                             </p>
                             {formData.countdownEvents.map((ev, idx) => (
                                 <div key={ev.id} className="flex flex-col gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
                                     <div className="flex gap-2 items-center">
                                         {/* Sorting Buttons */}
-                                        <div className="flex flex-col">
+                                        <div className="flex flex-col gap-1">
                                             <button
                                                 onClick={() => moveEvent(idx, 'up')}
                                                 disabled={idx === 0}
-                                                className="text-slate-400 hover:text-blue-500 disabled:opacity-30 p-0.5"
+                                                className="text-slate-500 hover:text-blue-600 disabled:opacity-30 p-1 bg-white rounded-md border border-slate-200"
                                             >
-                                                <RiArrowUpSFill size={16} />
+                                                <RiArrowUpSFill size={18} />
                                             </button>
                                             <button
                                                 onClick={() => moveEvent(idx, 'down')}
                                                 disabled={idx === formData.countdownEvents.length - 1}
-                                                className="text-slate-400 hover:text-blue-500 disabled:opacity-30 p-0.5"
+                                                className="text-slate-500 hover:text-blue-600 disabled:opacity-30 p-1 bg-white rounded-md border border-slate-200"
                                             >
-                                                <RiArrowDownSFill size={16} />
+                                                <RiArrowDownSFill size={18} />
                                             </button>
                                         </div>
 
                                         <div className="flex-1 space-y-2">
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-3">
                                                 <input
                                                     type="text"
                                                     value={ev.title}
                                                     onChange={(e) => handleEventChange(ev.id, 'title', e.target.value)}
                                                     placeholder="事件名称"
-                                                    className="flex-1 bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none text-sm font-bold text-slate-700"
+                                                    className="flex-1 bg-transparent border-b-2 border-slate-200 focus:border-blue-500 outline-none text-base font-bold text-slate-900"
                                                 />
                                                 <select
                                                     value={ev.type}
                                                     onChange={(e) => handleEventChange(ev.id, 'type', e.target.value)}
-                                                    className="bg-white border border-slate-200 rounded-lg text-xs px-2 py-1 outline-none focus:border-blue-500"
+                                                    className="bg-white border border-slate-300 rounded-xl text-sm px-3 py-1.5 outline-none focus:border-blue-500 font-bold text-slate-700 shadow-sm"
                                                 >
                                                     <option value="date">固定日期</option>
                                                     <option value="monthly">每月重复</option>
@@ -580,11 +594,11 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                                         type="date"
                                                         value={ev.value}
                                                         onChange={(e) => handleEventChange(ev.id, 'value', e.target.value)}
-                                                        className="w-full bg-white px-2 py-1 rounded border border-slate-200 outline-none text-xs text-slate-500 font-mono"
+                                                        className="w-full bg-white px-3 py-2 rounded-xl border border-slate-300 outline-none text-sm text-slate-900 font-mono shadow-sm"
                                                     />
                                                 )}
                                                 {ev.type === 'monthly' && (
-                                                    <div className="flex items-center gap-2 text-xs text-slate-600">
+                                                    <div className="flex items-center gap-2 text-base text-slate-700 font-bold">
                                                         <span>每月</span>
                                                         <input
                                                             type="number"
@@ -592,18 +606,18 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
                                                             max="31"
                                                             value={ev.value}
                                                             onChange={(e) => handleEventChange(ev.id, 'value', e.target.value)}
-                                                            className="w-16 bg-white px-2 py-1 rounded border border-slate-200 outline-none font-mono"
+                                                            className="w-20 bg-white px-3 py-2 rounded-xl border border-slate-300 outline-none font-mono text-sm text-slate-900 shadow-sm"
                                                         />
                                                         <span>号</span>
                                                     </div>
                                                 )}
                                                 {ev.type === 'weekly' && (
-                                                    <div className="flex items-center gap-2 text-xs text-slate-600">
+                                                    <div className="flex items-center gap-2 text-base text-slate-700 font-bold">
                                                         <span>每周</span>
                                                         <select
                                                             value={ev.value}
                                                             onChange={(e) => handleEventChange(ev.id, 'value', e.target.value)}
-                                                            className="bg-white px-2 py-1 rounded border border-slate-200 outline-none font-sans"
+                                                            className="bg-white px-3 py-2 rounded-xl border border-slate-300 outline-none font-sans text-sm shadow-sm"
                                                         >
                                                             {weekDays.map(d => (
                                                                 <option key={d.val} value={d.val}>{d.label}</option>
@@ -616,34 +630,34 @@ const SettingsModal = ({ isOpen, onClose, config, onSave, linksData, onLinksChan
 
                                         <button
                                             onClick={() => removeEvent(ev.id)}
-                                            className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors self-start"
+                                            className="p-2.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors self-start border border-transparent hover:border-rose-100"
                                         >
-                                            <RiDeleteBinLine size={16} />
+                                            <RiDeleteBinLine size={20} />
                                         </button>
                                     </div>
                                 </div>
                             ))}
                             <button
                                 onClick={addEvent}
-                                className="w-full py-2 flex items-center justify-center gap-2 text-blue-500 font-medium bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors text-sm"
+                                className="w-full py-4 flex items-center justify-center gap-2 text-blue-600 font-bold bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors text-base border border-blue-100"
                             >
-                                <RiAddLine size={16} /> 添加新事件
+                                <RiAddLine size={20} /> 添加新事件
                             </button>
                         </div>
                     )}
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
+                <div className="p-6 border-t border-gray-100 flex justify-end gap-4 bg-slate-50/30">
                     <button
                         onClick={onClose}
-                        className="px-5 py-2 rounded-xl text-slate-600 hover:bg-slate-50 font-medium text-sm transition-colors"
+                        className="px-8 py-3 rounded-xl text-slate-700 hover:bg-slate-200 font-bold text-base transition-colors"
                     >
                         取消
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-5 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-medium text-sm shadow-lg shadow-slate-200 transition-all transform active:scale-95"
+                        className="px-8 py-3 rounded-xl bg-slate-900 text-white hover:bg-black font-bold text-base shadow-xl shadow-slate-200 transition-all transform active:scale-95"
                     >
                         保存更改
                     </button>

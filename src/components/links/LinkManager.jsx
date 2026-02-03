@@ -117,14 +117,14 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
             {editingItem && (
                 <div className="fixed inset-0 bg-black/10 backdrop-blur-[1px] z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 w-full max-w-md overflow-visible">
-                        <h3 className="text-lg font-bold mb-4">
+                        <h3 className="text-xl font-bold mb-6 text-slate-950">
                             {editingItem.type === 'section' ? '编辑分类' : '编辑站点'}
                         </h3>
                         <div className="space-y-4">
                             {editingItem.type === 'section' ? (
                                 <>
                                     <div>
-                                        <label className="text-xs font-bold text-slate-500">分类名称</label>
+                                        <label className="text-[15px] font-bold text-slate-800 mb-2 block">分类名称</label>
                                         <input
                                             type="text"
                                             value={editingItem.data.title}
@@ -132,18 +132,18 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                                                 ...editingItem,
                                                 data: { ...editingItem.data, title: e.target.value }
                                             })}
-                                            className="w-full border-b border-slate-200 py-1 outline-none focus:border-blue-500"
+                                            className="w-full border-b-2 border-slate-200 py-2 outline-none focus:border-blue-500 text-base font-medium text-slate-900"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-bold text-slate-500">颜色标记</label>
+                                        <label className="text-[15px] font-bold text-slate-800 mb-2 block">颜色标记</label>
                                         <select
                                             value={editingItem.data.colorClass}
                                             onChange={e => setEditingItem({
                                                 ...editingItem,
                                                 data: { ...editingItem.data, colorClass: e.target.value }
                                             })}
-                                            className="w-full bg-slate-50 rounded px-2 py-1 mt-1 outline-none"
+                                            className="w-full bg-slate-50 rounded-xl px-3 py-3 mt-1 outline-none border border-slate-200 text-base font-medium"
                                         >
                                             {COLORS_OPTIONS.map(c => (
                                                 <option key={c.value} value={c.value}>{c.label}</option>
@@ -154,7 +154,7 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                             ) : (
                                 <>
                                     <div>
-                                        <label className="text-xs font-bold text-slate-500">标题</label>
+                                        <label className="text-[15px] font-bold text-slate-800 mb-2 block">标题</label>
                                         <input
                                             type="text"
                                             value={editingItem.data.title}
@@ -162,11 +162,11 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                                                 ...editingItem,
                                                 data: { ...editingItem.data, title: e.target.value }
                                             })}
-                                            className="w-full border-b border-slate-200 py-1 outline-none focus:border-blue-500"
+                                            className="w-full border-b-2 border-slate-200 py-2 outline-none focus:border-blue-500 text-base font-bold text-slate-900"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-bold text-slate-500">描述</label>
+                                        <label className="text-[15px] font-bold text-slate-800 mb-2 block">描述</label>
                                         <input
                                             type="text"
                                             value={editingItem.data.desc}
@@ -174,11 +174,11 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                                                 ...editingItem,
                                                 data: { ...editingItem.data, desc: e.target.value }
                                             })}
-                                            className="w-full border-b border-slate-200 py-1 outline-none focus:border-blue-500"
+                                            className="w-full border-b-2 border-slate-200 py-2 outline-none focus:border-blue-500 text-base text-slate-700"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-bold text-slate-500">链接 URL</label>
+                                        <label className="text-[15px] font-bold text-slate-800 mb-2 block">链接 URL</label>
                                         <input
                                             type="text"
                                             value={editingItem.data.url}
@@ -186,7 +186,7 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                                                 ...editingItem,
                                                 data: { ...editingItem.data, url: e.target.value }
                                             })}
-                                            className="w-full border-b border-slate-200 py-1 outline-none focus:border-blue-500"
+                                            className="w-full border-b-2 border-slate-200 py-2 outline-none focus:border-blue-500 text-base font-mono text-blue-600"
                                         />
                                     </div>
                                     <IconPicker
@@ -197,7 +197,7 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                                         })}
                                     />
                                     <div>
-                                        <label className="text-xs font-bold text-slate-500">标签 (逗号分隔)</label>
+                                        <label className="text-[15px] font-bold text-slate-800 mb-2 block">标签 (逗号分隔)</label>
                                         <input
                                             type="text"
                                             value={editingItem.data.tags.join(', ')}
@@ -208,22 +208,22 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                                                     tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean)
                                                 }
                                             })}
-                                            className="w-full border-b border-slate-200 py-1 outline-none focus:border-blue-500"
+                                            className="w-full border-b-2 border-slate-200 py-2 outline-none focus:border-blue-500 text-base text-slate-600"
                                         />
                                     </div>
                                 </>
                             )}
                         </div>
-                        <div className="flex justify-end gap-2 mt-6">
+                        <div className="flex justify-end gap-3 mt-8">
                             <button
                                 onClick={() => setEditingItem(null)}
-                                className="px-4 py-2 rounded-lg text-slate-500 hover:bg-slate-100"
+                                className="px-6 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-bold text-base transition-colors"
                             >
                                 取消
                             </button>
                             <button
                                 onClick={editingItem.type === 'section' ? saveSection : saveLink}
-                                className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+                                className="px-6 py-2.5 rounded-xl bg-slate-900 text-white hover:bg-black font-bold text-base transition-all active:scale-95 shadow-lg shadow-slate-200"
                             >
                                 保存
                             </button>
@@ -242,44 +242,44 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                     return (
                         <div key={section.id} className="relative">
                             {/* 分类头部 */}
-                            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-3 rounded-xl hover:border-blue-200 transition-colors group">
+                            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 p-4 rounded-xl hover:border-blue-300 transition-colors group shadow-sm">
                                 <button
                                     onClick={() => toggleSection(section.id)}
-                                    className="p-1 rounded hover:bg-slate-200 text-slate-400"
+                                    className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-500"
                                 >
                                     {expandedSections[section.id]
-                                        ? <RiArrowDownSLine size={16} />
-                                        : <RiArrowRightSLine size={16} />
+                                        ? <RiArrowDownSLine size={20} />
+                                        : <RiArrowRightSLine size={20} />
                                     }
                                 </button>
-                                <div className={`w-3 h-3 rounded-full ${section.colorClass}`}></div>
-                                <span className="font-bold text-slate-700 text-sm flex-1">{section.title}</span>
-                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className={`w-3.5 h-3.5 rounded-full ${section.colorClass} shadow-inner`}></div>
+                                <span className="font-bold text-slate-900 text-base flex-1">{section.title}</span>
+                                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button
                                         onClick={() => moveSection(idx, 'up')}
                                         disabled={idx === 0}
-                                        className="p-1.5 text-slate-400 hover:text-blue-500 disabled:opacity-20"
+                                        className="p-2 text-slate-500 hover:text-blue-600 disabled:opacity-20 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-100"
                                     >
-                                        <RiArrowUpLine size={14} />
+                                        <RiArrowUpLine size={18} />
                                     </button>
                                     <button
                                         onClick={() => moveSection(idx, 'down')}
                                         disabled={idx === sections.length - 1}
-                                        className="p-1.5 text-slate-400 hover:text-blue-500 disabled:opacity-20"
+                                        className="p-2 text-slate-500 hover:text-blue-600 disabled:opacity-20 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-100"
                                     >
-                                        <RiArrowDownLine size={14} />
+                                        <RiArrowDownLine size={18} />
                                     </button>
                                     <button
                                         onClick={() => setEditingItem({ type: 'section', id: section.id, data: { ...section } })}
-                                        className="p-1.5 text-slate-400 hover:text-blue-500"
+                                        className="p-2 text-slate-500 hover:text-blue-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-100"
                                     >
-                                        <RiEditLine size={14} />
+                                        <RiEditLine size={18} />
                                     </button>
                                     <button
                                         onClick={() => deleteSection(section.id)}
-                                        className="p-1.5 text-slate-400 hover:text-rose-500"
+                                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-transparent hover:border-rose-100"
                                     >
-                                        <RiDeleteBinLine size={14} />
+                                        <RiDeleteBinLine size={18} />
                                     </button>
                                 </div>
                             </div>
@@ -292,41 +292,41 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                                         return (
                                             <div
                                                 key={linkObj.originalIndex}
-                                                className="relative flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100 group"
+                                                className="relative flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 group transition-all"
                                             >
-                                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-500 shadow-sm z-10">
-                                                    <IconComponent size={16} />
+                                                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm z-10 transition-transform group-hover:scale-105">
+                                                    <IconComponent size={20} />
                                                 </div>
                                                 <div className="flex-1 min-w-0 z-10">
-                                                    <div className="text-sm font-medium text-slate-700 truncate">{linkObj.title}</div>
-                                                    <div className="text-xs text-slate-400 truncate">{linkObj.url}</div>
+                                                    <div className="text-[15px] font-bold text-slate-900 truncate">{linkObj.title}</div>
+                                                    <div className="text-sm text-slate-500 truncate font-mono">{linkObj.url.length > 40 ? linkObj.url.substring(0, 40) + '...' : linkObj.url}</div>
                                                 </div>
-                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-white/50 backdrop-blur rounded">
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-white/80 backdrop-blur-sm rounded-lg border border-slate-100 shadow-sm p-1">
                                                     <button
                                                         onClick={() => moveLink(linkObj.originalIndex, 'up', section.id)}
                                                         disabled={linkPos === 0}
-                                                        className="p-1.5 text-slate-400 hover:text-blue-500 disabled:opacity-20"
+                                                        className="p-1.5 text-slate-500 hover:text-blue-600 disabled:opacity-20 hover:bg-slate-50 rounded"
                                                     >
-                                                        <RiArrowUpSLine size={14} />
+                                                        <RiArrowUpSLine size={18} />
                                                     </button>
                                                     <button
                                                         onClick={() => moveLink(linkObj.originalIndex, 'down', section.id)}
                                                         disabled={linkPos === sectionLinksWithIndex.length - 1}
-                                                        className="p-1.5 text-slate-400 hover:text-blue-500 disabled:opacity-20"
+                                                        className="p-1.5 text-slate-500 hover:text-blue-600 disabled:opacity-20 hover:bg-slate-50 rounded"
                                                     >
-                                                        <RiArrowDownSLine size={14} />
+                                                        <RiArrowDownSLine size={18} />
                                                     </button>
                                                     <button
                                                         onClick={() => setEditingItem({ type: 'link', index: linkObj.originalIndex, data: { ...linkObj } })}
-                                                        className="p-1.5 text-slate-400 hover:text-blue-500"
+                                                        className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-slate-50 rounded"
                                                     >
-                                                        <RiEditLine size={14} />
+                                                        <RiEditLine size={18} />
                                                     </button>
                                                     <button
                                                         onClick={() => deleteLink(linkObj.originalIndex)}
-                                                        className="p-1.5 text-slate-400 hover:text-rose-500"
+                                                        className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded"
                                                     >
-                                                        <RiCloseLine size={14} />
+                                                        <RiCloseLine size={18} />
                                                     </button>
                                                 </div>
                                             </div>
@@ -334,9 +334,9 @@ const LinkManager = ({ links, sections, onUpdateLinks, onUpdateSections }) => {
                                     })}
                                     <button
                                         onClick={() => addLink(section.id)}
-                                        className="relative flex items-center gap-2 p-2 pl-2 text-xs text-blue-500 font-medium hover:text-blue-600 w-full text-left"
+                                        className="relative flex items-center gap-2 p-3 pl-3 text-sm text-blue-600 font-bold hover:text-blue-700 w-full text-left transition-colors"
                                     >
-                                        <RiAddLine size={14} /> 添加新站点
+                                        <RiAddLine size={18} /> 添加新站点
                                     </button>
                                 </div>
                             )}

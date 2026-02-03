@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { pinyin } from 'pinyin-pro'
 import { Solar } from 'lunar-javascript'
-import { RiSearch2Line, RiGhostLine, RiGoogleFill, RiMicrosoftFill } from '@remixicon/react'
+import { RiSearch2Line, RiGhostLine, RiGoogleFill, RiMicrosoftFill, RiSearchLine } from '@remixicon/react'
 import { linksData as defaultLinksData } from './data/links'
 import { getIconByName } from './utils/iconMap'
 import WeatherCard from './components/widgets/main/WeatherCard'
@@ -17,6 +17,12 @@ const defaultSections = [
     { id: 'productivity', title: '效率工具', colorClass: 'bg-emerald-500' },
     { id: 'social', title: '社交媒体', colorClass: 'bg-blue-500' },
     { id: 'media', title: '媒体娱乐', colorClass: 'bg-rose-500' },
+]
+
+// 默认搜索引擎
+const defaultSearchEngines = [
+    { id: 'google', name: 'Google', url: 'https://www.google.com/search?q={query}', icon: 'google', iconUrl: '', color: 'text-blue-500', bgColor: 'bg-blue-100' },
+    { id: 'bing', name: 'Bing', url: 'https://www.bing.com/search?q={query}', icon: 'bing', iconUrl: '', color: 'text-sky-600', bgColor: 'bg-sky-100' },
 ]
 
 // 默认配置
@@ -35,6 +41,9 @@ const defaultConfig = {
     backgroundImage: '',
     // 轮播组件
     enabledWidgets: ['github'],
+    // 搜索引擎设置
+    searchEngines: defaultSearchEngines,
+    defaultSearchEngine: 'google',
     // 倒计时事件
     countdownEvents: [
         { id: 1, title: '周末', type: 'weekly', value: '6', color: 'text-blue-500', bg: 'bg-blue-400' },
@@ -95,6 +104,7 @@ const App = () => {
     const [links, setLinks] = useState(loadLinks)
     const [sections, setSections] = useState(loadSections)
     const [settingsOpen, setSettingsOpen] = useState(false)
+    const [searchError, setSearchError] = useState(false)
     const searchInputRef = useRef(null)
 
     useEffect(() => {
@@ -229,26 +239,56 @@ const App = () => {
 
     const { lunarDate, festival } = getLunarInfo()
 
+    // 执行搜索引擎搜索
+    const executeSearch = (engine, query) => {
+        if (!engine || !query) return
+        const url = engine.url.replace('{query}', encodeURIComponent(query))
+        window.open(url, '_blank')
+        setSearch('')
+    }
+
     // 搜索引擎快捷键处理
     const handleSearchKeyDown = (e) => {
         if (e.key === 'Enter') {
             const val = search.trim()
-            if (val.startsWith('/g')) {
-                const query = val.substring(2).trim()
-                if (query) {
-                    window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank')
-                    setSearch('')
+            if (!val) return
+
+            // 如果没有匹配到任何卡片，使用默认搜索引擎
+            if (filteredLinks.length === 0 || filteredLinks.length === links.length) {
+                const engines = config.searchEngines || defaultSearchEngines
+                const defaultEngine = engines.find(e => e.id === config.defaultSearchEngine) || engines[0]
+                if (defaultEngine) {
+                    executeSearch(defaultEngine, val)
                 }
-                return
             }
-            if (val.startsWith('/b')) {
-                const query = val.substring(2).trim()
-                if (query) {
-                    window.open(`https://www.bing.com/search?q=${encodeURIComponent(query)}`, '_blank')
-                    setSearch('')
-                }
-                return
-            }
+        }
+    }
+
+    // 获取默认搜索引擎
+    const getDefaultEngine = () => {
+        const engines = config.searchEngines || defaultSearchEngines
+        return engines.find(e => e.id === config.defaultSearchEngine) || engines[0]
+    }
+
+    // 搜索引擎图标映射
+    const engineIconMap = {
+        google: RiGoogleFill,
+        bing: RiMicrosoftFill,
+    }
+
+    // 点击搜索按钮
+    const handleSearchButtonClick = () => {
+        const val = search.trim()
+        if (!val) {
+            // 空输入时触发报错动画
+            setSearchError(true)
+            searchInputRef.current?.focus()
+            setTimeout(() => setSearchError(false), 500)
+            return
+        }
+        const engine = getDefaultEngine()
+        if (engine) {
+            executeSearch(engine, val)
         }
     }
 
@@ -267,7 +307,7 @@ const App = () => {
                 <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-0" />
             )}
 
-            <div className="relative z-10 p-4 md:p-8 flex items-center justify-center min-h-screen">
+            <div className="relative z-10 p-4 md:p-8 flex items-start justify-center min-h-screen pt-8 md:pt-16">
                 <div className="max-w-[1400px] w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-5 auto-rows-min">
 
                     <div className="col-span-12 lg:col-span-5 flex flex-col justify-center py-4 px-2">
@@ -291,61 +331,54 @@ const App = () => {
                             </div>
 
                             <div className="mt-8 relative max-w-md group">
-                                {/* Icon */}
-                                <div className="absolute inset-y-0 left-0 pl-0 flex items-center pointer-events-none transition-transform duration-300 group-focus-within:scale-110 group-focus-within:-translate-y-0.5">
-                                    <RiSearch2Line size={20} className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                                </div>
-
-                                {/* Input */}
-                                <input
-                                    ref={searchInputRef}
-                                    type="text"
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    onKeyDown={handleSearchKeyDown}
-                                    placeholder="Type / to search..."
-                                    className="block w-full pl-8 pr-12 py-3 bg-transparent border-b-2 border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent transition-all font-sans text-lg relative z-10"
-                                />
-
-                                {/* Animated Bottom Line */}
-                                <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-500 ease-out group-focus-within:w-full z-20"></div>
-
-                                {/* Shortcut Hint */}
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none opacity-100 group-focus-within:opacity-0 transition-opacity duration-200">
-                                    <kbd className="hidden sm:inline-block px-2 py-0.5 bg-slate-100 border border-slate-200 rounded text-xs text-slate-400 font-mono">/</kbd>
-                                </div>
-
-                                {/* Google Search Hint */}
-                                {search.startsWith('/g') && (
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white/80 backdrop-blur-md border border-blue-100 rounded-xl p-3 shadow-lg z-30 flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
-                                            <RiGoogleFill size={18} />
+                                <div className="flex items-center gap-2">
+                                    {/* 搜索输入框容器 */}
+                                    <div className="flex-1 relative">
+                                        {/* Icon */}
+                                        <div className="absolute inset-y-0 left-0 pl-0 flex items-center pointer-events-none transition-transform duration-300 group-focus-within:scale-110 group-focus-within:-translate-y-0.5">
+                                            <RiSearch2Line size={20} className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-xs font-bold text-blue-600 uppercase tracking-wider">Google Search</div>
-                                            <div className="text-sm text-slate-700 truncate font-medium">
-                                                {search.substring(2).trim() || '输入搜索关键词...'}
-                                            </div>
-                                        </div>
-                                        <div className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-400 font-mono border border-slate-200">ENTER</div>
+
+                                        {/* Input */}
+                                        <input
+                                            ref={searchInputRef}
+                                            type="text"
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                            onKeyDown={handleSearchKeyDown}
+                                            placeholder="在此搜索"
+                                            className={`block w-full pl-8 pr-4 py-3 bg-transparent border-b-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent transition-all font-sans text-lg relative z-10 ${searchError ? 'border-red-400 animate-shake' : 'border-slate-200'}`}
+                                        />
+
+                                        {/* Animated Bottom Line */}
+                                        <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-500 ease-out group-focus-within:w-full z-20"></div>
                                     </div>
-                                )}
 
-                                {/* Bing Search Hint */}
-                                {search.startsWith('/b') && !search.startsWith('/g') && (
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white/80 backdrop-blur-md border border-sky-100 rounded-xl p-3 shadow-lg z-30 flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600">
-                                            <RiMicrosoftFill size={18} />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-xs font-bold text-sky-600 uppercase tracking-wider">Bing Search</div>
-                                            <div className="text-sm text-slate-700 truncate font-medium">
-                                                {search.substring(2).trim() || '输入搜索关键词...'}
-                                            </div>
-                                        </div>
-                                        <div className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-400 font-mono border border-slate-200">ENTER</div>
-                                    </div>
-                                )}
+                                    {/* 搜索按钮 - 根据默认搜索引擎显示图标 */}
+                                    {(() => {
+                                        const engine = getDefaultEngine()
+                                        // 优先级：iconUrl > iconName > 内置 icon 映射
+                                        let iconContent
+                                        if (engine?.iconUrl) {
+                                            iconContent = <img src={engine.iconUrl} alt={engine.name} className="w-5 h-5 object-contain" />
+                                        } else if (engine?.iconName) {
+                                            const CustomIcon = getIconByName(engine.iconName)
+                                            iconContent = <CustomIcon size={20} />
+                                        } else {
+                                            const IconComponent = engineIconMap[engine?.icon] || RiSearchLine
+                                            iconContent = <IconComponent size={20} />
+                                        }
+                                        return (
+                                            <button
+                                                onClick={handleSearchButtonClick}
+                                                className={`shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg ${engine?.bgColor || 'bg-slate-100'} ${engine?.color || 'text-slate-500'}`}
+                                                title={`使用 ${engine?.name || '搜索引擎'} 搜索`}
+                                            >
+                                                {iconContent}
+                                            </button>
+                                        )
+                                    })()}
+                                </div>
                             </div>
                         </div>
                     </div>
