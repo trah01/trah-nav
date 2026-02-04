@@ -1,9 +1,10 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { pinyin } from 'pinyin-pro'
 import { Solar } from 'lunar-javascript'
 import { RiSearch2Line, RiGhostLine, RiGoogleFill, RiMicrosoftFill, RiSearchLine } from '@remixicon/react'
 import { linksData as defaultLinksData } from './data/links'
 import { getIconByName } from './utils/iconMap'
+import { getStorageItem, setStorageItem, STORAGE_KEYS, migrateFromLocalStorage, onStorageChange } from './utils/storage'
 import WeatherCard from './components/widgets/main/WeatherCard'
 import CountdownCard from './components/widgets/main/CountdownCard'
 import UserProfile from './components/widgets/main/UserProfile'
@@ -52,61 +53,75 @@ const defaultConfig = {
     ]
 }
 
-// 从 localStorage 加载配置
-function loadConfig() {
-    try {
-        const saved = localStorage.getItem('trah-nav-config')
-        if (saved) {
-            return { ...defaultConfig, ...JSON.parse(saved) }
-        }
-    } catch (e) {
-        console.warn('加载配置失败:', e)
-    }
-    return defaultConfig
-}
-
-// 从 localStorage 加载 links 数据
-function loadLinks() {
-    try {
-        const saved = localStorage.getItem('trah-nav-links')
-        if (saved) {
-            const parsed = JSON.parse(saved)
-            // 将字符串图标名称转换回组件
-            return parsed.map(item => ({
-                ...item,
-                icon: typeof item.icon === 'string' ? getIconByName(item.icon) : item.icon
-            }))
-        }
-    } catch (e) {
-        console.warn('加载链接数据失败:', e)
-    }
-    return defaultLinksData
-}
-
-// 从 localStorage 加载 sections 数据
-function loadSections() {
-    try {
-        const saved = localStorage.getItem('trah-nav-sections')
-        if (saved) {
-            return JSON.parse(saved)
-        }
-    } catch (e) {
-        console.warn('加载分类数据失败:', e)
-    }
-    return defaultSections
+// 处理 links 数据，将字符串图标名称转换为组件
+function processLinks(linksData) {
+    if (!linksData || !Array.isArray(linksData)) return defaultLinksData
+    return linksData.map(item => ({
+        ...item,
+        icon: typeof item.icon === 'string' ? getIconByName(item.icon) : item.icon
+    }))
 }
 
 const App = () => {
     const [time, setTime] = useState(new Date())
     const [search, setSearch] = useState('')
     const [greeting, setGreeting] = useState('')
-    const [config, setConfig] = useState(loadConfig)
-    const [links, setLinks] = useState(loadLinks)
-    const [sections, setSections] = useState(loadSections)
+    const [config, setConfig] = useState(defaultConfig)
+    const [links, setLinks] = useState(defaultLinksData)
+    const [sections, setSections] = useState(defaultSections)
     const [settingsOpen, setSettingsOpen] = useState(false)
     const [searchError, setSearchError] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)  // 加载状态
     const searchInputRef = useRef(null)
     const isComposingRef = useRef(false)  // 跟踪输入法组合状态
+
+    // 异步加载存储数据
+    useEffect(() => {
+        const loadStorageData = async () => {
+            try {
+                // 先执行数据迁移（从 localStorage 迁移到 chrome.storage.sync）
+                await migrateFromLocalStorage()
+
+                // 并行加载所有数据
+                const [savedConfig, savedLinks, savedSections] = await Promise.all([
+                    getStorageItem(STORAGE_KEYS.CONFIG, null),
+                    getStorageItem(STORAGE_KEYS.LINKS, null),
+                    getStorageItem(STORAGE_KEYS.SECTIONS, null),
+                ])
+
+                if (savedConfig) {
+                    setConfig({ ...defaultConfig, ...savedConfig })
+                }
+                if (savedLinks) {
+                    setLinks(processLinks(savedLinks))
+                }
+                if (savedSections) {
+                    setSections(savedSections)
+                }
+            } catch (e) {
+                console.warn('加载存储数据失败:', e)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        loadStorageData()
+
+        // 监听存储变化（多标签页/设备同步）
+        const unsubscribe = onStorageChange(async (changes) => {
+            if (changes[STORAGE_KEYS.CONFIG]?.newValue) {
+                setConfig({ ...defaultConfig, ...changes[STORAGE_KEYS.CONFIG].newValue })
+            }
+            if (changes[STORAGE_KEYS.LINKS]?.newValue) {
+                setLinks(processLinks(changes[STORAGE_KEYS.LINKS].newValue))
+            }
+            if (changes[STORAGE_KEYS.SECTIONS]?.newValue) {
+                setSections(changes[STORAGE_KEYS.SECTIONS].newValue)
+            }
+        })
+
+        return () => unsubscribe()
+    }, [])
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000)
@@ -159,32 +174,30 @@ const App = () => {
         }
     }, [config.siteTitle, config.favicon])
 
-    const handleSaveConfig = (newConfig) => {
+    // 保存配置（使用 useCallback 避免不必要的重渲染）
+    const handleSaveConfig = useCallback(async (newConfig) => {
         setConfig(newConfig)
-        localStorage.setItem('trah-nav-config', JSON.stringify(newConfig))
-    }
+        await setStorageItem(STORAGE_KEYS.CONFIG, newConfig)
+    }, [])
 
     // 处理 links 数据更新（从导入）
-    const handleLinksChange = (newLinks) => {
-        // 将字符串图标名称转换回组件
-        const processedLinks = newLinks.map(item => ({
-            ...item,
-            icon: typeof item.icon === 'string' ? getIconByName(item.icon) : item.icon
-        }))
+    const handleLinksChange = useCallback(async (newLinks) => {
+        // 将字符串图标名称转换回组件用于显示
+        const processedLinks = processLinks(newLinks)
         setLinks(processedLinks)
         // 存储时保存字符串形式的图标名称
         const linksToSave = newLinks.map(item => ({
             ...item,
             icon: typeof item.icon === 'string' ? item.icon : (item.icon.name || item.icon.displayName || 'RiLinkLine')
         }))
-        localStorage.setItem('trah-nav-links', JSON.stringify(linksToSave))
-    }
+        await setStorageItem(STORAGE_KEYS.LINKS, linksToSave)
+    }, [])
 
     // 处理 sections 数据更新
-    const handleSectionsChange = (newSections) => {
+    const handleSectionsChange = useCallback(async (newSections) => {
         setSections(newSections)
-        localStorage.setItem('trah-nav-sections', JSON.stringify(newSections))
-    }
+        await setStorageItem(STORAGE_KEYS.SECTIONS, newSections)
+    }, [])
 
     const getPinyinMatch = (text, query) => {
         if (!query) return false

@@ -1,6 +1,7 @@
 # 🧩 TRAH Nav | Bento Dashboard
 
-[![Version](https://img.shields.io/badge/version-1.0.6-blue.svg)](https://github.com/trah01/trah-nav/releases)
+[![Version](https://img.shields.io/badge/version-1.0.7-blue.svg)](https://github.com/trah01/trah-nav/releases)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-商店下载-4285F4.svg?style=flat&logo=google-chrome)](https://chromewebstore.google.com/detail/trah-nav)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Demo](https://img.shields.io/badge/Demo-在线演示-ff69b4.svg)](https://home.trah.cn)
 [![React](https://img.shields.io/badge/React-18.x-61DAFB.svg?style=flat&logo=react)](https://reactjs.org/)
@@ -62,11 +63,18 @@
 
 作为新标签页使用，获得最佳沉浸体验：
 
-1. 前往 [Releases](https://github.com/trah01/trah-nav/releases) 下载最新的 `trah-nav-extension-v1.0.6.zip`
+**方式一：Chrome / Edge 商店安装（推荐）**
+
+- **Chrome 商店**：[点击安装 TRAH Nav](https://chromewebstore.google.com/detail/trah-nav)
+- **Edge 商店**：即将上线
+
+**方式二：手动安装**
+
+1. 前往 [Releases](https://github.com/trah01/trah-nav/releases) 下载最新的 `trah-nav-v1.0.7.zip`
 2. 解压压缩包
 3. 打开 Chrome 扩展程序页面 (`chrome://extensions/`)
 4. 开启 **"开发者模式"**
-5. 点击 **"加载已解压的扩展程序"**，选择解压后的目录即可
+5. 点击 **"加载已解压的扩展程序"**，选择解压后的 `dist` 目录即可
 
 ### 2. Docker 部署
 
@@ -118,6 +126,12 @@ src/
 ---
 
 ## 🔄 更新日志
+
+### v1.0.7 (2026-02-04)
+- ☁️ 新增 Chrome / Edge 跨设备数据同步（登录账号后自动同步配置）
+- 🔄 旧用户升级自动迁移 localStorage 数据，无需手动操作
+- 🌐 上架 Chrome 商店，支持一键安装
+- 🇨🇳 汉化扩展描述信息
 
 ### v1.0.6 (2026-02-03)
 - 🔧 重构 GitHub 贡献热力图，使用真实 API 获取数据
