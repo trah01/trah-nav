@@ -1,7 +1,7 @@
 # 🧩 TRAH Nav | Bento Dashboard
 
 [![Version](https://img.shields.io/badge/version-1.0.7-blue.svg)](https://github.com/trah01/trah-nav/releases)
-[![Chrome Web Store](https://img.shields.io/badge/Chrome-商店下载-4285F4.svg?style=flat&logo=google-chrome)](https://chromewebstore.google.com/detail/trah-nav)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-商店下载-4285F4.svg?style=flat&logo=google-chrome)](https://chromewebstore.google.com/detail/trah-nav/dbaaiaaodjhdpnondphhkidgljcmilbg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Demo](https://img.shields.io/badge/Demo-在线演示-ff69b4.svg)](https://home.trah.cn)
 [![React](https://img.shields.io/badge/React-18.x-61DAFB.svg?style=flat&logo=react)](https://reactjs.org/)
@@ -65,7 +65,7 @@
 
 **方式一：Chrome / Edge 商店安装（推荐）**
 
-- **Chrome 商店**：[点击安装 TRAH Nav](https://chromewebstore.google.com/detail/trah-nav)
+- **Chrome 商店**：[点击安装 TRAH Nav](https://chromewebstore.google.com/detail/trah-nav/dbaaiaaodjhdpnondphhkidgljcmilbg)
 - **Edge 商店**：即将上线
 
 **方式二：手动安装**
