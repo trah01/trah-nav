@@ -1,6 +1,6 @@
 # 🧩 TRAH Nav | Bento Dashboard
 
-[![Version](https://img.shields.io/badge/version-1.0.5-blue.svg)](https://github.com/trah01/trah-nav/releases)
+[![Version](https://img.shields.io/badge/version-1.0.6-blue.svg)](https://github.com/trah01/trah-nav/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Demo](https://img.shields.io/badge/Demo-在线演示-ff69b4.svg)](https://home.trah.cn)
 [![React](https://img.shields.io/badge/React-18.x-61DAFB.svg?style=flat&logo=react)](https://reactjs.org/)
@@ -62,7 +62,7 @@
 
 作为新标签页使用，获得最佳沉浸体验：
 
-1. 前往 [Releases](https://github.com/trah01/trah-nav/releases) 下载最新的 `trah-nav-extension-v1.0.5.zip`
+1. 前往 [Releases](https://github.com/trah01/trah-nav/releases) 下载最新的 `trah-nav-extension-v1.0.6.zip`
 2. 解压压缩包
 3. 打开 Chrome 扩展程序页面 (`chrome://extensions/`)
 4. 开启 **"开发者模式"**
@@ -119,7 +119,7 @@ src/
 
 ## 🔄 更新日志
 
-### v1.0.5 (2026-02-03)
+### v1.0.6 (2026-02-03)
 - 🔧 重构 GitHub 贡献热力图，使用真实 API 获取数据
 - ✨ 新增月份标签、星期标签、颜色图例和总贡献数统计
 - 🐛 修复中文输入法回车上屏误触发搜索的问题
