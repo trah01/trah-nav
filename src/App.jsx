@@ -4,6 +4,7 @@ import { Solar } from 'lunar-javascript'
 import { RiSearch2Line, RiGhostLine, RiGoogleFill, RiMicrosoftFill, RiSearchLine } from '@remixicon/react'
 import { linksData as defaultLinksData } from './data/links'
 import { getIconByName } from './utils/iconMap'
+import { useTranslation } from './utils/i18n'
 import { getStorageItem, setStorageItem, STORAGE_KEYS, migrateFromLocalStorage, onStorageChange } from './utils/storage'
 import WeatherCard from './components/widgets/main/WeatherCard'
 import CountdownCard from './components/widgets/main/CountdownCard'
@@ -43,6 +44,7 @@ const defaultConfig = {
     // 轮播组件
     enabledWidgets: ['github'],
     // 搜索引擎设置
+    useCustomSearch: false,  // 默认使用 Chrome 浏览器的默认搜索引擎
     searchEngines: defaultSearchEngines,
     defaultSearchEngine: 'google',
     // 倒计时事件
@@ -65,7 +67,6 @@ function processLinks(linksData) {
 const App = () => {
     const [time, setTime] = useState(new Date())
     const [search, setSearch] = useState('')
-    const [greeting, setGreeting] = useState('')
     const [config, setConfig] = useState(defaultConfig)
     const [links, setLinks] = useState(defaultLinksData)
     const [sections, setSections] = useState(defaultSections)
@@ -74,6 +75,17 @@ const App = () => {
     const [isLoading, setIsLoading] = useState(true)  // 加载状态
     const searchInputRef = useRef(null)
     const isComposingRef = useRef(false)  // 跟踪输入法组合状态
+    const { t } = useTranslation()
+
+    // 动态计算问候语 - 根据时间和语言自动更新
+    const greeting = useMemo(() => {
+        const hour = time.getHours()
+        if (hour < 6) return t('greeting.night')
+        else if (hour < 11) return t('greeting.morning')
+        else if (hour < 14) return t('greeting.noon')
+        else if (hour < 18) return t('greeting.afternoon')
+        else return t('greeting.evening')
+    }, [time, t])
 
     // 异步加载存储数据
     useEffect(() => {
@@ -125,13 +137,6 @@ const App = () => {
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000)
-
-        const hour = new Date().getHours()
-        if (hour < 6) setGreeting('夜深了，注意休息')
-        else if (hour < 11) setGreeting('早上好，开启新的一天')
-        else if (hour < 14) setGreeting('午安，记得小憩')
-        else if (hour < 18) setGreeting('下午好，继续加油')
-        else setGreeting('晚上好，享受闲暇')
 
         // 快捷键支持
         const handleKeyDown = (e) => {
@@ -253,11 +258,31 @@ const App = () => {
 
     const { lunarDate, festival } = getLunarInfo()
 
-    // 执行搜索引擎搜索
-    const executeSearch = (engine, query) => {
-        if (!engine || !query) return
-        const url = engine.url.replace('{query}', encodeURIComponent(query))
-        window.open(url, '_blank')
+    // 执行搜索
+    // 根据配置决定使用 Chrome Search API 还是自定义搜索引擎
+    const executeSearch = (query) => {
+        if (!query) return
+
+        if (config.useCustomSearch) {
+            // 使用自定义搜索引擎
+            const engines = config.searchEngines || defaultSearchEngines
+            const engine = engines.find(e => e.id === config.defaultSearchEngine) || engines[0]
+            if (engine) {
+                const url = engine.url.replace('{query}', encodeURIComponent(query))
+                window.open(url, '_blank')
+            }
+        } else {
+            // 使用 Chrome Search API，尊重用户浏览器设置
+            if (typeof chrome !== 'undefined' && chrome.search && chrome.search.query) {
+                chrome.search.query({
+                    text: query,
+                    disposition: 'NEW_TAB'
+                })
+            } else {
+                // 非 Chrome 扩展环境的回退方案（如开发模式）
+                window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank')
+            }
+        }
         setSearch('')
     }
 
@@ -277,13 +302,7 @@ const App = () => {
         if (e.key === 'Enter' && !isComposingRef.current) {
             const val = search.trim()
             if (!val) return
-
-            // 无论有无匹配结果，都使用默认搜索引擎进行搜索
-            const engines = config.searchEngines || defaultSearchEngines
-            const defaultEngine = engines.find(e => e.id === config.defaultSearchEngine) || engines[0]
-            if (defaultEngine) {
-                executeSearch(defaultEngine, val)
-            }
+            executeSearch(val)
         }
     }
 
@@ -309,10 +328,7 @@ const App = () => {
             setTimeout(() => setSearchError(false), 500)
             return
         }
-        const engine = getDefaultEngine()
-        if (engine) {
-            executeSearch(engine, val)
-        }
+        executeSearch(val)
     }
 
     // 自定义壁纸样式
@@ -371,7 +387,7 @@ const App = () => {
                                             onKeyDown={handleSearchKeyDown}
                                             onCompositionStart={handleCompositionStart}
                                             onCompositionEnd={handleCompositionEnd}
-                                            placeholder="在此搜索"
+                                            placeholder={t('search.placeholder')}
                                             className={`block w-full pl-8 pr-4 py-3 bg-transparent border-b-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-transparent transition-all font-sans text-lg relative z-10 ${searchError ? 'border-red-400 animate-shake' : 'border-slate-200'}`}
                                         />
 
@@ -379,27 +395,39 @@ const App = () => {
                                         <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-500 ease-out group-focus-within:w-full z-20"></div>
                                     </div>
 
-                                    {/* 搜索按钮 - 根据默认搜索引擎显示图标 */}
+                                    {/* 搜索按钮 - 根据搜索模式显示不同图标 */}
                                     {(() => {
-                                        const engine = getDefaultEngine()
-                                        // 优先级：iconUrl > iconName > 内置 icon 映射
-                                        let iconContent
-                                        if (engine?.iconUrl) {
-                                            iconContent = <img src={engine.iconUrl} alt={engine.name} className="w-5 h-5 object-contain" />
-                                        } else if (engine?.iconName) {
-                                            const CustomIcon = getIconByName(engine.iconName)
-                                            iconContent = <CustomIcon size={20} />
-                                        } else {
-                                            const IconComponent = engineIconMap[engine?.icon] || RiSearchLine
-                                            iconContent = <IconComponent size={20} />
+                                        // 如果使用自定义搜索引擎，显示对应引擎图标
+                                        if (config.useCustomSearch) {
+                                            const engine = getDefaultEngine()
+                                            let iconContent
+                                            if (engine?.iconUrl) {
+                                                iconContent = <img src={engine.iconUrl} alt={engine.name} className="w-5 h-5 object-contain" />
+                                            } else if (engine?.iconName) {
+                                                const CustomIcon = getIconByName(engine.iconName)
+                                                iconContent = <CustomIcon size={20} />
+                                            } else {
+                                                const IconComponent = engineIconMap[engine?.icon] || RiSearchLine
+                                                iconContent = <IconComponent size={20} />
+                                            }
+                                            return (
+                                                <button
+                                                    onClick={handleSearchButtonClick}
+                                                    className={`shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg ${engine?.bgColor || 'bg-slate-100'} ${engine?.color || 'text-slate-500'}`}
+                                                    title={t('search.searchWith', { name: engine?.name || 'Search' })}
+                                                >
+                                                    {iconContent}
+                                                </button>
+                                            )
                                         }
+                                        // 使用 Chrome 默认搜索引擎，显示通用搜索图标
                                         return (
                                             <button
                                                 onClick={handleSearchButtonClick}
-                                                className={`shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg ${engine?.bgColor || 'bg-slate-100'} ${engine?.color || 'text-slate-500'}`}
-                                                title={`使用 ${engine?.name || '搜索引擎'} 搜索`}
+                                                className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg bg-slate-100 text-slate-600"
+                                                title={t('search.searchWithChrome')}
                                             >
-                                                {iconContent}
+                                                <RiSearchLine size={20} />
                                             </button>
                                         )
                                     })()}
@@ -437,7 +465,7 @@ const App = () => {
                     {!hasResults && (
                         <div className="col-span-12 py-20 text-center">
                             <RiGhostLine size={36} className="text-slate-300 mb-4 inline-block" />
-                            <p className="text-slate-500">未找到相关应用</p>
+                            <p className="text-slate-500">{t('home.noResults')}</p>
                         </div>
                     )}
 
