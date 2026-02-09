@@ -2,9 +2,8 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
+    tags:
+      - 'v*'
 
 jobs:
 
@@ -34,4 +33,4 @@ jobs:
         platforms: linux/amd64,linux/arm64
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/trah-nav:latest
-          ${{ secrets.DOCKERHUB_USERNAME }}/trah-nav:${{ github.sha }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/trah-nav:${{ github.ref_name }}

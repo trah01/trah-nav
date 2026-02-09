@@ -19,6 +19,7 @@ npm-debug.log*
 
 # Environment
 .env
+.agent
 .env.local
 .env.*.local
 
