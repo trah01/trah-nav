@@ -1,6 +1,6 @@
 # 🧩 TRAH Nav | Bento Dashboard
 
-[![Version](https://img.shields.io/badge/version-1.0.7-blue.svg)](https://github.com/trah01/trah-nav/releases)
+[![Version](https://img.shields.io/badge/version-1.0.8-blue.svg)](https://github.com/trah01/trah-nav/releases)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-商店下载-4285F4.svg?style=flat&logo=google-chrome)](https://chromewebstore.google.com/detail/trah-nav/dbaaiaaodjhdpnondphhkidgljcmilbg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Demo](https://img.shields.io/badge/Demo-在线演示-ff69b4.svg)](https://home.trah.cn)
@@ -70,7 +70,7 @@
 
 **方式二：手动安装**
 
-1. 前往 [Releases](https://github.com/trah01/trah-nav/releases) 下载最新的 `trah-nav-v1.0.7.zip`
+1. 前往 [Releases](https://github.com/trah01/trah-nav/releases) 下载最新的 `trah-nav-v1.0.8.zip`
 2. 解压压缩包
 3. 打开 Chrome 扩展程序页面 (`chrome://extensions/`)
 4. 开启 **"开发者模式"**
@@ -126,6 +126,14 @@ src/
 ---
 
 ## 🔄 更新日志
+
+### v1.0.8 (2026-02-09)
+- 🌐 **全站国际化 (i18n)**：完整支持中英文切换，包含设置面板、组件和系统提示。
+- ⏳ **倒计时功能增强**：
+  - 支持**多日事件**设置持续天数（如周末2天、假期9天）。
+  - 事件期间自动显示为"**就是现在**"并配有动态交互效果。
+  - 优化每周/每月重复逻辑，支持显示"今天"、"明天"。
+- ⚡ **体验优化**：首页问候语切换语言时实时更新，无需刷新。
 
 ### v1.0.7 (2026-02-04)
 - ☁️ 新增 Chrome / Edge 跨设备数据同步（登录账号后自动同步配置）
