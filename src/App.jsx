@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { pinyin } from 'pinyin-pro'
 import { Solar } from 'lunar-javascript'
-import { RiSearch2Line, RiGhostLine, RiGoogleFill, RiMicrosoftFill, RiSearchLine } from '@remixicon/react'
+import { RiSearch2Line, RiGhostLine, RiGoogleFill, RiMicrosoftFill, RiSearchLine, RiEdit2Line, RiCheckLine } from '@remixicon/react'
 import { linksData as defaultLinksData } from './data/links'
 import { getIconByName } from './utils/iconMap'
 import { useTranslation } from './utils/i18n'
@@ -73,6 +73,9 @@ const App = () => {
     const [settingsOpen, setSettingsOpen] = useState(false)
     const [searchError, setSearchError] = useState(false)
     const [isLoading, setIsLoading] = useState(true)  // 加载状态
+    const [isEditMode, setIsEditMode] = useState(false)
+    const [draggedItem, setDraggedItem] = useState(null)
+    const [dropTarget, setDropTarget] = useState(null)
     const searchInputRef = useRef(null)
     const isComposingRef = useRef(false)  // 跟踪输入法组合状态
     const { t } = useTranslation()
@@ -223,11 +226,107 @@ const App = () => {
 
     const getGroup = (cat) => filteredLinks.filter(l => l.category === cat)
 
-    // 根据 sections 动态生成分组
     const linkGroups = sections.map(section => ({
         ...section,
         links: getGroup(section.id)
     }))
+
+    // 拖拽相关逻辑
+    const handleDragStart = (e, link) => {
+        setDraggedItem(link)
+        setDropTarget(null)
+        e.dataTransfer.effectAllowed = 'move'
+    }
+
+    const handleDragOver = (e, targetCategoryId, index) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (!isEditMode) return
+
+        if (index !== null) {
+            const rect = e.currentTarget.getBoundingClientRect()
+            const position = (e.clientX - rect.left) < (rect.width / 2) ? 'before' : 'after'
+
+            let targetIndex = index
+            if (position === 'after') {
+                targetIndex += 1
+            }
+
+            setDropTarget(prev => {
+                if (prev?.sectionId === targetCategoryId && prev?.index === targetIndex) return prev
+                return { sectionId: targetCategoryId, index: targetIndex }
+            })
+        } else {
+            // Dragging over empty section
+            setDropTarget(prev => {
+                if (prev?.sectionId === targetCategoryId && prev?.index === 0) return prev
+                return { sectionId: targetCategoryId, index: 0 }
+            })
+        }
+    }
+
+    const handleDragEnd = () => {
+        setDraggedItem(null)
+        setDropTarget(null)
+    }
+
+    const handleDrop = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (!draggedItem || !dropTarget) {
+            handleDragEnd()
+            return
+        }
+
+        let newLinks = [...links]
+        const sourceIndex = newLinks.findIndex(l => l.url === draggedItem.url && l.title === draggedItem.title)
+
+        if (sourceIndex === -1) {
+            handleDragEnd()
+            return
+        }
+
+        const targetSectionLinks = newLinks.filter(l => l.category === dropTarget.sectionId)
+        const referenceLink = targetSectionLinks[dropTarget.index]
+
+        const [removedItem] = newLinks.splice(sourceIndex, 1)
+        removedItem.category = dropTarget.sectionId
+
+        if (referenceLink && referenceLink !== draggedItem) {
+            const insertIndex = newLinks.findIndex(l => l === referenceLink)
+            if (insertIndex !== -1) {
+                newLinks.splice(insertIndex, 0, removedItem)
+            } else {
+                newLinks.push(removedItem)
+            }
+        } else if (referenceLink === draggedItem) {
+            newLinks.splice(sourceIndex, 0, removedItem)
+        } else {
+            newLinks.push(removedItem)
+        }
+
+        setLinks(newLinks)
+        handleDragEnd()
+    }
+
+    const toggleEditMode = () => {
+        if (isEditMode) {
+            // 退出的时候保存
+            handleLinksChange(links)
+        } else {
+            setSearch('')
+        }
+        setIsEditMode(!isEditMode)
+    }
+
+    const handleDeleteLink = (itemToDelete) => {
+        if (window.confirm(`确定要删除 "${itemToDelete.title}" 吗？`)) {
+            const newLinks = links.filter(l => !(l.url === itemToDelete.url && l.title === itemToDelete.title))
+            setLinks(newLinks)
+            // 如果在编辑模式下，最好也立即保存一下
+            handleLinksChange(newLinks)
+        }
+    }
 
     const hasResults = filteredLinks.length > 0
 
@@ -236,21 +335,42 @@ const App = () => {
         const solar = Solar.fromDate(time)
         const lunar = solar.getLunar()
 
+        const lunarMonthCh = lunar.getMonthInChinese()
+        const lunarDayCh = lunar.getDayInChinese()
+        const lunarMonthNum = lunar.getMonth()
+        const lunarDayNum = lunar.getDay()
+
         // 农历日期
-        const lunarDate = `${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`
+        const isLeap = lunarMonthNum < 0 ? t('lunar.leap') : ''
+        const lunarDate = t('lunar.date', {
+            monthCh: lunarMonthCh,
+            dayCh: lunarDayCh,
+            monthNum: Math.abs(lunarMonthNum),
+            dayNum: lunarDayNum,
+            isLeap
+        })
 
         // 获取节日（优先级：公历节日 > 农历节日 > 节气）
         const solarFestivals = solar.getFestivals()
         const lunarFestivals = lunar.getFestivals()
         const jieQi = lunar.getJieQi()
 
-        let festival = ''
+        let rawFestival = ''
         if (solarFestivals.length > 0) {
-            festival = solarFestivals[0]
+            rawFestival = solarFestivals[0]
         } else if (lunarFestivals.length > 0) {
-            festival = lunarFestivals[0]
+            rawFestival = lunarFestivals[0]
         } else if (jieQi) {
-            festival = jieQi
+            rawFestival = jieQi
+        }
+
+        // 尝试翻译节日
+        let festival = ''
+        if (rawFestival) {
+            const festivalKey = `festival.${rawFestival}`
+            const translatedFestival = t(festivalKey)
+            // 如果未能翻译（返回了 key），则回退到原始中文名称
+            festival = translatedFestival === festivalKey ? rawFestival : translatedFestival
         }
 
         return { lunarDate, festival }
@@ -356,7 +476,7 @@ const App = () => {
                             </h1>
                             <div className="flex items-center flex-wrap gap-2 mt-3">
                                 <span className="px-4 py-1.5 rounded-full bg-slate-200 text-slate-600 text-sm font-bold uppercase tracking-wider">
-                                    {time.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', weekday: 'short' })}
+                                    {time.toLocaleDateString(t('date.format'), { month: 'short', day: 'numeric', weekday: 'short' })}
                                 </span>
                                 <span className="px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 text-sm font-medium">
                                     {lunarDate}
@@ -456,9 +576,18 @@ const App = () => {
                         <LinkSection
                             key={group.id}
                             title={group.title}
+                            sectionId={group.id}
                             index={index + 1}
                             colorClass={group.colorClass}
                             links={group.links}
+                            isEditMode={isEditMode}
+                            draggedItem={draggedItem}
+                            dropTarget={dropTarget}
+                            onDragStart={handleDragStart}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                            onDragEnd={handleDragEnd}
+                            onDelete={handleDeleteLink}
                         />
                     ))}
 
@@ -485,6 +614,18 @@ const App = () => {
 
                 </div>
             </div>
+
+            {/* 编辑模式悬浮按钮 */}
+            <button
+                onClick={toggleEditMode}
+                className={`fixed outline-none bottom-8 right-8 z-[60] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg ${isEditMode
+                    ? 'bg-amber-500 text-white shadow-amber-500/30 ring-4 ring-amber-100'
+                    : 'bg-white text-slate-600 border border-slate-200 shadow-slate-200/50 hover:bg-slate-50'
+                    }`}
+                title={isEditMode ? '完成编辑' : '编辑模式'}
+            >
+                {isEditMode ? <RiCheckLine size={24} /> : <RiEdit2Line size={24} />}
+            </button>
 
             <SettingsModal
                 isOpen={settingsOpen}

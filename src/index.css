@@ -91,3 +91,20 @@ body {
 .animate-shake {
     animation: shake 0.4s ease-in-out;
 }
+
+/* 编辑模式抖动动画 */
+@keyframes jiggle {
+    0% {
+        transform: rotate(-1deg);
+    }
+    50% {
+        transform: rotate(1deg);
+    }
+    100% {
+        transform: rotate(-1deg);
+    }
+}
+
+.animate-jiggle {
+    animation: jiggle 0.3s ease-in-out infinite;
+}

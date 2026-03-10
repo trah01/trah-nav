@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from '../../../utils/i18n'
 import {
     RiSunLine,
     RiSunCloudyLine,
@@ -21,10 +22,11 @@ const iconMap = {
 }
 
 const WeatherCard = ({ apiKey, adcode }) => {
+    const { t } = useTranslation()
     const [weather, setWeather] = useState({
         temp: '--',
-        condition: '加载中...',
-        city: '定位中...',
+        condition: 'loading',
+        city: 'locating',
         low: '-',
         high: '-',
         icon: 'ri-sun-cloudy-line'
@@ -83,7 +85,7 @@ const WeatherCard = ({ apiKey, adcode }) => {
                 }
             } catch (error) {
                 console.error("天气数据加载失败:", error)
-                setWeather(prev => ({ ...prev, condition: "暂无数据", city: "未知" }))
+                setWeather(prev => ({ ...prev, condition: "noData", city: "unknownCity" }))
             }
         }
 
@@ -94,6 +96,21 @@ const WeatherCard = ({ apiKey, adcode }) => {
 
     const WeatherIcon = iconMap[weather.icon] || RiSunCloudyLine
 
+    const getConditionText = (cond) => {
+        if (cond === 'loading') return t('weather.loading')
+        if (cond === 'noData') return t('weather.noData')
+
+        const key = `weather.${cond}`
+        const translated = t(key)
+        return translated === key ? cond : translated
+    }
+
+    const getCityText = (city) => {
+        if (city === 'locating') return t('weather.locating')
+        if (city === 'unknownCity') return t('weather.unknownCity')
+        return city
+    }
+
     return (
         <div className="h-full flex flex-col justify-between p-5 sm:p-6 bg-gradient-to-br from-sky-500 to-blue-700 rounded-[32px] text-white shadow-lg relative overflow-hidden group">
             <div className="absolute -top-4 -right-4 opacity-10 pointer-events-none">
@@ -102,15 +119,15 @@ const WeatherCard = ({ apiKey, adcode }) => {
             <div className="relative z-10 flex-1 flex flex-col justify-center">
                 <div className="flex items-center space-x-2 opacity-90 mb-1">
                     <RiMapPinLine size={14} />
-                    <span className="text-sm font-medium tracking-wide">{weather.city}</span>
+                    <span className="text-sm font-medium tracking-wide">{getCityText(weather.city)}</span>
                 </div>
                 <h2 className="text-5xl font-bold font-mono mt-2">{weather.temp}°</h2>
             </div>
             <div className="relative z-10 mt-4">
-                <p className="font-medium text-lg">{weather.condition}</p>
+                <p className="font-medium text-lg">{getConditionText(weather.condition)}</p>
                 <div className="flex justify-between items-center mt-2 text-sm opacity-80 font-mono">
-                    <span>最高: {weather.high}°</span>
-                    <span>最低: {weather.low}°</span>
+                    <span>{t('weather.high')}: {weather.high}°</span>
+                    <span>{t('weather.low')}: {weather.low}°</span>
                 </div>
             </div>
         </div>
