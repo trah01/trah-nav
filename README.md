@@ -1,6 +1,6 @@
 # 🧩 TRAH Nav | Bento Dashboard
 
-[![Version](https://img.shields.io/badge/version-1.0.8-blue.svg)](https://github.com/trah01/trah-nav/releases)
+[![Version](https://img.shields.io/badge/version-1.0.9-blue.svg)](https://github.com/trah01/trah-nav/releases)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-商店下载-4285F4.svg?style=flat&logo=google-chrome)](https://chromewebstore.google.com/detail/trah-nav/dbaaiaaodjhdpnondphhkidgljcmilbg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Demo](https://img.shields.io/badge/Demo-在线演示-ff69b4.svg)](https://home.trah.cn)
@@ -70,7 +70,7 @@
 
 **方式二：手动安装**
 
-1. 前往 [Releases](https://github.com/trah01/trah-nav/releases) 下载最新的 `trah-nav-v1.0.8.zip`
+1. 前往 [Releases](https://github.com/trah01/trah-nav/releases) 下载最新的 `trah-nav-v1.0.9.zip`
 2. 解压压缩包
 3. 打开 Chrome 扩展程序页面 (`chrome://extensions/`)
 4. 开启 **"开发者模式"**
@@ -126,6 +126,11 @@ src/
 ---
 
 ## 🔄 更新日志
+
+### v1.0.9 (2026-03-10)
+- 🌍 **国际化完善**：完美支持全站中英文无缝切换，补充天气状况、农历、传统节日及二十四节气的中英文翻译对。
+- 🌤️ **天气组件优化**：调整了根据语言环境动态显示加载和未找到城市时的提示信息。
+- ✨ **交互体验升级**：在编辑模式新增轻微动画反馈，优化链接资源与分类的体验。
 
 ### v1.0.8 (2026-02-09)
 - 🌐 **全站国际化 (i18n)**：完整支持中英文切换，包含设置面板、组件和系统提示。
