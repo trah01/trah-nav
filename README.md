@@ -78,12 +78,14 @@
 
 ### 2. Docker 部署
 
-适合拥有私有服务器的用户：
+适合拥有私有服务器的用户，**极致轻量化，超低占用**：
 
 ```bash
 docker-compose up -d
 # 默认端口 3000
 ```
+
+<img width="614" height="569" alt="image" src="https://github.com/user-attachments/assets/cece38d7-8655-4914-8b45-561c9fb59ec3" />
 
 ### 3. 本地开发
 
